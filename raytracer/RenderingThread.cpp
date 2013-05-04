@@ -48,9 +48,9 @@ void RenderingThread::run()
 {	
 	double M = m->getMass();
 	double a = m->getAngMomentum();
-	Metric* g = m->getMetric(KerrManifold::EF);
+	Metric* g = m->getMetric(EF);
 	
-	Point p0 = Point(KerrManifold::EF, pos0);
+	Point p0 = Point(EF, pos0);
 	
 	Entity* ship = new Entity(m, p0, vector4(1.0, 0.0, 0.0, 0.0),  vector4(0.0, 1.0, 0.0, 0.0),
 									 vector4(0.0, 0.0, 0.0, 1.0), vector4(0.0, 0.0, -1.0, 0.0));
@@ -103,10 +103,10 @@ void RenderingThread::run()
 			while(r > C*rs && r < BOX_R)
 			{
 				photon.propagate();
-				r = m->convertPointTo(photon.getPos(), KerrManifold::EF)[1];
+				r = m->convertPointTo(photon.getPos(), EF)[1];
 			}
 			
-			Point fin_pos = m->convertPointTo(photon.getPos(), KerrManifold::EF);
+			Point fin_pos = m->convertPointTo(photon.getPos(), EF);
 			//vector4 box_u2 = box_u/g->g_v(box_u,box_u,fin_pos);
 			
 			//source_omega = g->g_v(photon.getVector(1),box_u2,fin_pos);

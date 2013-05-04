@@ -12,6 +12,7 @@ QT += opengl
 HEADERS += MainWindow.h RenderingThread.h
 SOURCES += MainWindow.cpp raytracer.cpp RenderingThread.cpp \
 			../engine/kerr.cpp \
+			../engine/kerr_coords.cpp \
 			../engine/entity.cpp \
 			../engine/particle.cpp \
 			../engine/geometry.cpp \
