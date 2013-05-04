@@ -208,7 +208,7 @@ void MainWindow::startRendering()
 	a_ph = att_phi->text().toDouble();
 	
 	if(render != NULL) delete render;
-	render = new RenderingThread(resx, resy, fov, 0.1, a, vector4(0.0, p_r, p_th, p_ph), vector4(0.0, v_r, v_th, v_ph),
+	render = new RenderingThread(resx, resy, fov, 0.1, a*0.1, vector4(0.0, p_r, p_th, p_ph), vector4(0.0, v_r, v_th, v_ph),
 						a_th, a_ph, background);
 	connect(render, SIGNAL(finished()), this, SLOT(finish()));
 	connect(render, SIGNAL(finished()), timer, SLOT(stop()));
