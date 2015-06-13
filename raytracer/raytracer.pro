@@ -5,16 +5,16 @@
 TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
-INCLUDEPATH += . ../engine
+INCLUDEPATH += . ../gr-engine/engine
 QT += opengl
 
 # Input
 HEADERS += MainWindow.h RenderingThread.h
 SOURCES += MainWindow.cpp raytracer.cpp RenderingThread.cpp \
-			../engine/kerr.cpp \
-			../engine/kerr_coords.cpp \
-			../engine/entity.cpp \
-			../engine/particle.cpp \
-			../engine/geometry.cpp \
-			../engine/dpintegrator.cpp \
-			../engine/numeric.cpp
+			../gr-engine/engine/kerr.cpp \
+			../gr-engine/engine/kerr_coords.cpp \
+			../gr-engine/engine/entity.cpp \
+			../gr-engine/engine/particle.cpp \
+			../gr-engine/engine/geometry.cpp \
+			../gr-engine/engine/dpintegrator.cpp \
+			../gr-engine/engine/numeric.cpp
