@@ -7,20 +7,25 @@
 
 class PaintArea : public QWidget
 {
-	QImage img;
+	QImage* img;
 protected:
 	void paintEvent(QPaintEvent*);
 public:
 	PaintArea(QWidget*);
 	~PaintArea() {}
-	void setImage(const QImage&);
+	void setImage(QImage*);
 };
 
 class MainWindow : public QMainWindow
 {
 Q_OBJECT
 	QTimer* timer;
-	RenderingThread* render;
+	int nThreads;
+	RenderingThread** render;
+	bool* render_running;
+
+	QImage* image;
+	QMutex imageMutex;
 	
 	PaintArea* paintArea;
 	
@@ -34,6 +39,9 @@ Q_OBJECT
 	
 	QSlider* sAngMom;
 	QSlider* sFov;
+
+	int findThread(QThread*);
+	bool allStopped();
 	
 public:
     MainWindow();
@@ -47,6 +55,9 @@ public slots:
 	void debugMsg(QString);
 	void startRendering();
 	void selectBg();
+
+signals:
+	void finished();
 };
 
 #endif

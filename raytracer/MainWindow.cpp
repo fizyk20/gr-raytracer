@@ -7,7 +7,16 @@
 
 MainWindow::MainWindow()
 {
-	render = NULL;
+	nThreads = QThread::idealThreadCount();
+	render = new RenderingThread*[nThreads];
+	render_running = new bool[nThreads];
+	for(int i = 0; i < nThreads; i++)
+	{
+		render[i] = NULL;
+		render_running[i] = false;
+	}
+	image = NULL;
+
 	setWindowTitle("Black Hole Imaging");
 	resize(800,530);
 	move(100,100);
@@ -19,6 +28,9 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
+	if(image != NULL)
+		delete image;
+	delete[] render;
 	delete timer;
 }
 
@@ -172,6 +184,21 @@ void MainWindow::createComponents()
 	connect(run, SIGNAL(clicked()), timer, SLOT(start()));
 }
 
+int MainWindow::findThread(QThread* thread)
+{
+	for(int i = 0; i < nThreads; i++)
+		if(render[i] == thread)
+			return i;
+	return -1;
+}
+
+bool MainWindow::allStopped()
+{
+	for(int i = 0; i < nThreads; i++)
+		if(render_running[i]) return false;
+	return true;
+}
+
 void MainWindow::startRendering()
 {
 	if(background == "")
@@ -207,32 +234,51 @@ void MainWindow::startRendering()
 	a_th = att_theta->text().toDouble();
 	a_ph = att_phi->text().toDouble();
 	
-	if(render != NULL) delete render;
-	render = new RenderingThread(resx, resy, fov, 0.1, a*0.1, vector4(0.0, p_r, p_th, p_ph), vector4(0.0, v_r, v_th, v_ph),
-						a_th, a_ph, background);
-	connect(render, SIGNAL(finished()), this, SLOT(finish()));
-	connect(render, SIGNAL(finished()), timer, SLOT(stop()));
-	connect(render, SIGNAL(debugMsg(QString)), this, SLOT(debugMsg(QString)));
-	render -> start();
+	if(image != NULL)
+		delete image;
+	image = new QImage(resx, resy, QImage::Format_RGB32);
+	image->fill(qRgb(255,255,255));
+	paintArea->setImage(image);
+
+	for(int i=0; i < nThreads; i++)
+	{
+		if(render[i] != NULL) delete render[i];
+		int miny = resy / nThreads * i;
+		int maxy = resy / nThreads * (i+1);
+		render[i] = new RenderingThread(resx, resy, miny, maxy, fov,
+				0.1, a*0.1, vector4(0.0, p_r, p_th, p_ph), vector4(0.0, v_r, v_th, v_ph),
+				a_th, a_ph, background, image, &imageMutex);
+		connect(render[i], SIGNAL(finished()), this, SLOT(finish()));
+		connect(this, SIGNAL(finished()), timer, SLOT(stop()));
+		connect(render[i], SIGNAL(debugMsg(QString)), this, SLOT(debugMsg(QString)));
+		render[i] -> start();
+		render_running[i] = true;
+	}
 }
 
 void MainWindow::tick()
 {
-	int x,y;
-	if(render != NULL)
+	if(!allStopped())
 	{
-		x = render->getX();
-		y = render->getY();
-		statusBar()->showMessage("X: " + QString::number(x) + "\tY: " + QString::number(y), 20000);
-	
-		paintArea->setImage(render->getImage());
+		int nRunning = 0;
+		for(int i=0; i<nThreads; i++)
+			if(render_running[i]) nRunning++;
+
+		statusBar()->showMessage("Running threads: " + QString::number(nRunning), 20000);
 		paintArea->repaint();
 	}
 }
 
 void MainWindow::finish()
 {
-	QMessageBox::information(this, "Renderer", "Rendering finished!");
+	QThread* finishedThread = (QThread*)sender();
+	render_running[findThread(finishedThread)] = false;
+	if(allStopped())
+	{
+		emit finished();
+		image->save("result.jpg");
+		QMessageBox::information(this, "Renderer", "Rendering finished!");
+	}
 }
 
 void MainWindow::debugMsg(QString msg)
@@ -257,15 +303,18 @@ void MainWindow::selectBg()
 PaintArea::PaintArea(QWidget* parent)
 	: QWidget(parent)
 {
+	img = NULL;
 }
 
-void PaintArea::setImage(const QImage& _img)
+void PaintArea::setImage(QImage* _img)
 {
 	img = _img;
 }
 
 void PaintArea::paintEvent(QPaintEvent* ev)
 {
+	if(img == NULL) return;
+
 	QPainter p(this);
-	p.drawImage(0, 0, img);
+	p.drawImage(0, 0, *img);
 }

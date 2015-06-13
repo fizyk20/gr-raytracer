@@ -17,20 +17,19 @@ Q_OBJECT
 	double theta, phi; //camera orientation
 	
 	QString file;
-	int max_x, max_y;
+	int resx, resy, min_y, max_y;
 	KerrManifold* m;
 	
-	QImage render;
-	
-	double step(double r, double rs);
+	QImage* image;
+	QPainter render;
+	QMutex* imageMutex;
 public:
 	double debug;
 	
-	RenderingThread(int, int, double, double, double, vector4, vector4, double, double, QString);
+	RenderingThread(int resx, int resy, int min_y, int max_y, double fov1, double _M, double _angm, vector4 _p0, vector4 _v0, double th, double ph, QString _file, QImage* image, QMutex* mutex);
 	~RenderingThread();
 	int getX();
 	int getY();
-	const QImage& getImage();
 	void run();
 signals:
 	void debugMsg(QString);
