@@ -9,4 +9,4 @@ It is Qt4-based, so you need the Qt libraries to compile it.
 - Choose resolution up to 512x512
 
 ## Details
-More details and a compiled version are available at http://ebvalaim.mydevil.net/en/raytracer-2/
+More details and a compiled version are available at https://ebvalaim.pl/en/raytracer-2/
