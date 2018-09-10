@@ -1,3 +1,7 @@
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QStatusBar>
 #include "MainWindow.h"
 #include <math.h>
 
@@ -283,7 +287,7 @@ void MainWindow::finish()
 
 void MainWindow::debugMsg(QString msg)
 {
-	printf("%s\n",msg.toAscii().data());
+	printf("%s\n",msg.toLatin1().data());
 }
 
 void MainWindow::selectBg()

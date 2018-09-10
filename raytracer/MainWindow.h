@@ -1,8 +1,14 @@
 #ifndef __MAINWINDOW__
 #define __MAINWINDOW__
 
-#include <QtGui>
+#include <QImage>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QSlider>
+#include <QString>
 #include <QTimer>
+#include <QWidget>
 #include "RenderingThread.h"
 
 class PaintArea : public QWidget
